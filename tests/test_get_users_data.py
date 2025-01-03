@@ -28,19 +28,29 @@ def test_list_users():
             validate(item, USER_DATA_SCHEME)
             with allure.step(f'email оканчивается на {EMAIL_ENDS}'):
                 assert item['email'].endswith(EMAIL_ENDS)
-        assert str(item['id']) in item['avatar']
-        assert item['avatar'].endswith(str(item['id']) + AVATAR_ENDS)
+            with allure.step(f'наличие {item['id']} в {item['avatar']}'):
+                assert str(item['id']) in item['avatar']
+            with allure.step(f'{item['avatar']} содержит окончание {item['id']} +{AVATAR_ENDS}'):
+                assert item['avatar'].endswith(str(item['id']) + AVATAR_ENDS)
 
-
+@allure.suite('Запрос на одного юзера')
+@allure.title('Single <user>')
 def test_single_user():
-    response = httpx.get(BASE_URL + SINGLE_USER)
-    assert response.status_code == 200
+    with allure.step(f' Выполнен запрос по адресу: {BASE_URL + SINGLE_USER}'):
+        response = httpx.get(BASE_URL + SINGLE_USER)
+    with allure.step('Status code 200'):
+        assert response.status_code == 200
     data = response.json()['data']
 
-    assert data['email'].endswith(EMAIL_ENDS)
-    assert data['avatar'].endswith(str(data['id']) + AVATAR_ENDS)
+    with allure.step(f'{data['email']} содержит окончание {EMAIL_ENDS}'):
+        assert data['email'].endswith(EMAIL_ENDS)
+    with allure.step(f'{data['avatar']} содержит окончание {str(data['id']) + AVATAR_ENDS}'):
+        assert data['avatar'].endswith(str(data['id']) + AVATAR_ENDS)
 
-
+@allure.suite('Запрос на несуществующий юзера')
+@allure.title('Not found <user>')
 def test_not_found_user():
-    response = httpx.get(BASE_URL + NOT_FOUND)
-    assert response.status_code == 404
+    with allure.step(f' Выполнен запрос по адресу: {BASE_URL + NOT_FOUND}'):
+        response = httpx.get(BASE_URL + NOT_FOUND)
+    with allure.step('Status code 404'):
+        assert response.status_code == 404
